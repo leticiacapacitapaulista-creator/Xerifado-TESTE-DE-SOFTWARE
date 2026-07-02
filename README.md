@@ -1,20 +1,17 @@
-📝 Sistema de Gerenciamento de Almoxarifado
+## 📝 Sistema de Gerenciamento de Almoxarifado
 Este é um sistema web desenvolvido para o controle, monitoramento e gerenciamento de insumos e produtos de um Almoxarifado. O sistema conta com controle de níveis de acesso por cargos (Administrador, Gestor e Vendedor), cálculo automático de estoque baixo e envio automatizado de alertas de reabastecimento.
 
 O ambiente e o banco de dados são gerenciados usando o Docker, enquanto a suíte de testes de integração é executada na sua máquina local, comunicando-se diretamente com o banco de dados ativo no container.
 
-🚀 Tecnologias Utilizadas
+## 🚀 Tecnologias Utilizadas
+
 Python 3.14 — Linguagem base do ecossistema.
-
 Flask 1.3.0 — Micro-framework web para construção das rotas e lógica do servidor.
-
 MySQL — Banco de dados relacional para armazenamento de usuários, produtos e movimentações.
-
 Docker Desktop — Criação e isolamento do container de banco de dados.
-
 Pytest 9.1.0 — Framework utilizado para a automação e execução da suíte de testes de integração.
 
-🛠️ Como Iniciar o Projeto (Docker Desktop)
+## 🛠️ Como Iniciar o Projeto (Docker Desktop)
 Siga o passo a passo abaixo para subir o banco de dados MySQL no Docker do seu computador:
 
 Abra o Docker Desktop no seu computador.
@@ -102,7 +99,7 @@ pytest testes/test_regras_estoque.py::test_get_itens_estoque_baixo_inclui_itens_
 4. Endpoints e Rotas HTTP (test_rotas_http.py)
 Valida os códigos de resposta HTTP diretos gerados pelo servidor web do Flask.
 
-Geral do arquivo:
+# Geral do arquivo:
 
 PowerShell
 pytest testes/test_rotas_http.py -v -s
@@ -133,5 +130,5 @@ pytest testes/test_banco_mocks.py::test_registrar_movimentacao_cria_registro_com
 # Garante o filtro correto separando o tipo "reabastecimento" no histórico
 pytest testes/test_banco_mocks.py::test_get_alertas_reabastecimento_filtra_registros_reabastecimento -v -s
 
-🛑 Parar o Ambiente
+## 🛑 Parar o Ambiente
 Para encerrar os serviços do banco de dados e fechar os containers do Docker de forma limpa:
