@@ -49,6 +49,14 @@ Com o banco de dados ativo no Docker, você pode rodar os comandos abaixo direta
 
 ## 🌟 Comando para rodar TODOS os testes do projeto de uma vez:
 
+## EMERGÊNCIA:
+deactivate                       
+>> Remove-Item -Recurse -Force .venv
+>> python -m venv .venv
+>> .\.venv\Scripts\Activate.ps1
+>> python -m pip install -r requirements.txt
+>> python -m pip install pytest
+
 PowerShell
 
 # pytest testes/ -v -s
