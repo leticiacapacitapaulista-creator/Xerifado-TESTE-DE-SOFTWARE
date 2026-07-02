@@ -6,9 +6,13 @@ O ambiente e o banco de dados são gerenciados usando o Docker, enquanto a suít
 ## 🚀 Tecnologias Utilizadas
 
 Python 3.14 — Linguagem base do ecossistema.
+
 Flask 1.3.0 — Micro-framework web para construção das rotas e lógica do servidor.
+
 MySQL — Banco de dados relacional para armazenamento de usuários, produtos e movimentações.
+
 Docker Desktop — Criação e isolamento do container de banco de dados.
+
 Pytest 9.1.0 — Framework utilizado para a automação e execução da suíte de testes de integração.
 
 ## 🛠️ Como Iniciar o Projeto (Docker Desktop)
