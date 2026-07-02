@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Almoxarifado</title>
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root { --bg-body:#f4f7f6; --bg-sidebar:#2c3e50; --text-sidebar:#ecf0f1; --bg-header:#ffffff; --text-primary:#1f2933; --text-secondary:#475569; --card-bg:#ffffff; --border-color:#d8dee9; --input-bg:#ffffff; --input-border:#7c8b9a; --accent-color:#2563eb; --success-color:#0f9d58; --danger-color:#c0392b; --hover-sidebar:#34495e; --shadow:rgba(0,0,0,0.08); }
+        body.dark-mode { --bg-body:#0f1419; --bg-sidebar:#0b1016; --text-sidebar:#f4f7fb; --bg-header:#171c23; --text-primary:#f7fafc; --text-secondary:#d6e0ea; --card-bg:#1c232d; --border-color:#5f6f7f; --input-bg:#232b35; --input-border:#8da0b8; --accent-color:#62a9ff; --success-color:#33c46b; --danger-color:#ff7b72; --hover-sidebar:#223349; --shadow:rgba(0,0,0,0.55); }
+        body { font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin:0; background-color:var(--bg-body); color:var(--text-primary); transition:0.3s; }
+        .sidebar { width:250px; background-color:var(--bg-sidebar); color:var(--text-sidebar); position:fixed; height:100%; overflow-y:auto; }
+        .sidebar .logo { padding:30px; text-align:center; border-bottom:1px solid rgba(255,255,255,0.1); }
+        .sidebar .logo img.sidebar-logo { width:140px; height:auto; margin-bottom:15px; }
+        .sidebar nav ul { list-style:none; padding:0; margin:0; }
+        .sidebar nav li a { display:block; padding:15px 30px; text-decoration:none; color:var(--text-sidebar); transition:0.3s; }
+        .sidebar nav li a:hover, .sidebar nav li.active a { background-color:var(--hover-sidebar); color:white; }
+        .sidebar nav li a i { margin-right:10px; }
+        .main-content { margin-left:250px; }
+        .header { background-color:var(--bg-header); padding:15px 30px; border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; z-index:100; }
+        body.dark-mode .form-container, body.dark-mode .table-container, body.dark-mode .card, body.dark-mode .product-card, body.dark-mode .modal-content, body.dark-mode .dropdown-menu { box-shadow:0 6px 18px rgba(0,0,0,0.45); }
+        body.dark-mode .table-container table th { background-color:#27313b; color:#f7fafc; }
+        body.dark-mode .table-container table td { color:#f2f5f8; }
+        body.dark-mode .stock-display { background-color:#1f2933; color:#f7fafc; }
+        body.dark-mode .btn-edit, body.dark-mode .btn-submit, body.dark-mode .stock-action button { color:#ffffff; }
+        body.dark-mode .btn-delete { color:#ffffff; }
+        .header h1 { margin:0; font-size:1.5rem; }
+        .hamburger-btn { background:none; border:none; font-size:1.5rem; cursor:pointer; color:var(--text-primary); padding:10px; }
+        .dropdown-menu { display:none; position:absolute; right:0; top:50px; background-color:var(--card-bg); border:1px solid var(--border-color); border-radius:8px; width:200px; z-index:1000; box-shadow:0 4px 12px var(--shadow); }
+        .dropdown-menu.show { display:block; }
+        .dropdown-menu a, .dropdown-menu button { display:block; width:100%; padding:12px 20px; text-align:left; background:none; border:none; color:var(--text-primary); text-decoration:none; cursor:pointer; border-bottom:1px solid var(--border-color); }
+        .dropdown-menu a:hover, .dropdown-menu button:hover { background-color:var(--bg-body); }
+        .dashboard-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:30px; }
+        .card { background-color:var(--card-bg); padding:30px; border-radius:8px; border:1px solid var(--border-color); box-shadow:0 4px 6px var(--shadow); }
+        .card .big-number { font-size:2.5em; font-weight:bold; margin:10px 0; }
+        .card.item-count .big-number { color:var(--accent-color); }
+        .card.low-stock .big-number { color:var(--danger-color); }
+        .main-content main { padding:30px; }
+        .form-container { background-color:var(--card-bg); border-radius:8px; padding:30px; margin-bottom:30px; border:1px solid var(--border-color); }
+        .form-group { margin-bottom:15px; }
+        .form-group label { display:block; margin-bottom:5px; font-weight:bold; }
+        .form-group input, .form-group select { width:100%; padding:10px; border:1px solid var(--input-border); background-color:var(--input-bg); color:var(--text-primary); border-radius:5px; box-sizing:border-box; }
+        .btn-submit { background-color:var(--success-color); color:white; padding:12px 20px; border:none; border-radius:5px; cursor:pointer; }
+        .btn-update { background-color:var(--accent-color); }
+        .btn-cancel { background-color:#95a5a6; color:white; padding:12px 20px; border-radius:5px; text-decoration:none; margin-left:10px; }
+        .table-container { background-color:var(--card-bg); border-radius:8px; overflow-x:auto; border:1px solid var(--border-color); }
+        table { width:100%; border-collapse:collapse; }
+        th, td { padding:15px; text-align:left; border-bottom:1px solid var(--border-color); color:var(--text-primary); }
+        th { background-color:var(--bg-body); font-weight:bold; }
+        .btn-edit { background-color:var(--accent-color); color:white; padding:5px 10px; border-radius:5px; text-decoration:none; margin-right:5px; }
+        .btn-delete { background-color:var(--danger-color); color:white; padding:5px 10px; border-radius:5px; border:none; cursor:pointer; }
+        .app-tab-controls { display:flex; background-color:var(--bg-header); border-bottom:1px solid var(--border-color); padding:0 30px; }
+        .app-tab-controls .tab-link { padding:15px 20px; text-decoration:none; color:var(--text-secondary); font-weight:bold; border-bottom:3px solid transparent; margin-bottom:-1px; }
+        .app-tab-controls .tab-link.active { color:var(--accent-color); border-bottom-color:var(--accent-color); }
+        .tab-content { display:none; }
+        .tab-content.active { display:block; }
+        .vendedor-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:25px; }
+        .product-card { background:var(--card-bg); border-radius:10px; padding:20px; border:1px solid var(--border-color); border-left:5px solid var(--accent-color); display:flex; flex-direction:column; justify-content:space-between; }
+        .product-card:hover { transform:translateY(-5px); }
+        .stock-display { text-align:center; background-color:var(--bg-body); padding:10px; border-radius:5px; margin-bottom:20px; }
+        .stock-display .value { font-size:2.2em; font-weight:bold; }
+        .stock-action { display:flex; gap:10px; padding-top:15px; border-top:1px solid var(--border-color); }
+        .stock-action input { width:70px; text-align:center; }
+        .stock-action button { flex:1; background-color:#e67e22; color:white; border:none; padding:10px; border-radius:4px; cursor:pointer; font-weight:bold; }
+        .modal-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:2000; justify-content:center; align-items:center; }
+        .modal-content { background-color:var(--card-bg); padding:30px; border-radius:8px; width:100%; max-width:400px; position:relative; }
+        .modal-close { position:absolute; top:15px; right:20px; cursor:pointer; font-size:1.5rem; color:var(--text-secondary); }
+        .footer { text-align:center; padding:20px; margin-top:30px; color:var(--text-secondary); border-top:1px solid var(--border-color); background-color:var(--bg-header); }
+        .assistant-fab { background:linear-gradient(135deg, var(--accent-color), #0f766e); color:white; border:none; border-radius:999px; padding:10px 14px; cursor:pointer; font-weight:700; display:inline-flex; align-items:center; gap:8px; margin-right:10px; box-shadow:0 4px 12px rgba(0,0,0,0.2); }
+        .assistant-fab:hover { filter:brightness(1.08); }
+        .assistant-panel { position:fixed; right:20px; bottom:20px; width:min(360px, calc(100vw - 24px)); background:var(--card-bg); border:1px solid var(--border-color); border-radius:12px; box-shadow:0 12px 24px rgba(0,0,0,0.25); padding:16px; z-index:2200; display:none; }
+        .assistant-panel.show { display:block; }
+        .assistant-panel h3 { margin:0 0 8px; font-size:1rem; }
+        .assistant-panel p { margin:0 0 10px; color:var(--text-secondary); font-size:0.95rem; }
+        .assistant-status { background:rgba(37,99,235,0.12); color:var(--text-primary); border:1px solid rgba(37,99,235,0.25); padding:8px 10px; border-radius:8px; margin-bottom:10px; font-size:0.95rem; }
+        .assistant-actions { display:flex; gap:8px; flex-wrap:wrap; }
+        .assistant-actions button { border:none; border-radius:8px; padding:8px 10px; cursor:pointer; background:var(--accent-color); color:white; font-weight:600; }
+        .assistant-actions button.secondary { background:#64748b; }
+        .reabastecimento-alert { border-left:5px solid #16a34a; background:linear-gradient(135deg, #ecfdf3 0%, #dcfce7 100%); color:#14532d; box-shadow:0 6px 16px rgba(22, 163, 74, 0.12); }
+        .reabastecimento-alert h2 { color:#166534; }
+        .reabastecimento-alert ul { padding-left:20px; }
+        .reabastecimento-item { margin-bottom:10px; padding:10px 12px; background:#ffffff; border-radius:8px; border:1px solid #bbf7d0; color:#14532d; }
+        .reabastecimento-quantidade { color:#15803d; font-weight:700; }
+        .reabastecimento-meta { margin-top:4px; color:#166534; }
+        .tab-link .notification-bell { display:none; margin-left:8px; color:#f59e0b; }
+        .tab-link.has-notification .notification-bell { display:inline-block; animation:pulse 1.2s infinite; }
+        .notification-pill { display:inline-flex; align-items:center; justify-content:center; min-width:22px; height:22px; margin-left:8px; padding:0 6px; border-radius:999px; background:#dc2626; color:white; font-size:0.8rem; font-weight:700; line-height:1; }
+        @keyframes pulse { 0%,100% { transform:scale(1); opacity:1; } 50% { transform:scale(1.12); opacity:0.8; } }
+        body.dark-mode .reabastecimento-alert { background:linear-gradient(135deg, #123d2b 0%, #1d5a3f 100%); border-left-color:#5ee7a8; color:#f8fff9; box-shadow:0 8px 24px rgba(0,0,0,0.35); }
+        body.dark-mode .reabastecimento-alert h2 { color:#e9fff2; }
+        body.dark-mode .reabastecimento-item { background:rgba(4, 20, 14, 0.88); border-color:rgba(94, 231, 168, 0.45); color:#f8fff9; }
+        body.dark-mode .reabastecimento-quantidade { color:#8cf2b5; }
+        body.dark-mode .reabastecimento-meta { color:#dffce8; }
+    </style>
+</head>
+<body>
+    <div id="app-view">
+        <div class="sidebar">
+            <div class="logo">
+                <img src="{{ url_for('static', filename='logo_hd.png') }}" alt="Xerifado" class="sidebar-logo">
+                <h3>Xerifado</h3>
+                <p style="font-size:0.8em; color:#bdc3c7;">Perfil: {{ current_user_role|upper }}</p>
+            </div>
+            <nav>
+                <ul>
+                    <li class="{% if active_tab == 'dashboard' %}active{% endif %}"><a href="{{ url_for('index') }}"><i class="fas fa-box-open"></i> Produtos</a></li>
+                    {% if current_user_role != 'vendedor' %}
+                    <li class="{% if active_tab == 'locais' %}active{% endif %}"><a href="{{ url_for('index', tab='locais') }}"><i class="fas fa-warehouse"></i> Locais</a></li>
+                    <li class="{% if active_tab == 'fornecedores' %}active{% endif %}"><a href="{{ url_for('index', tab='fornecedores') }}"><i class="fas fa-truck"></i> Fornecedores</a></li>
+                    <li class="{% if active_tab == 'usuarios' %}active{% endif %}"><a href="{{ url_for('index', tab='usuarios') }}"><i class="fas fa-users-cog"></i> Usuários</a></li>
+                    <li class="{% if active_tab == 'relatorios' %}active{% endif %}"><a href="{{ url_for('index', tab='relatorios') }}"><i class="fas fa-chart-bar"></i> Relatórios</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+
+        <div class="main-content">
+            <header class="header">
+                <h1>Painel {{ current_user_role|capitalize }}</h1>
+                <div class="user-menu" style="display:flex; align-items:center; gap:8px;">
+                    <button type="button" class="assistant-fab" onclick="toggleAssistantPanel()" aria-label="Abrir assistente por voz"><i class="fas fa-microphone"></i> Voz</button>
+                    <button class="hamburger-btn" onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
+                    <div id="dropdownMenu" class="dropdown-menu">
+                        <button onclick="toggleTheme()"><span id="theme-icon">🌙</span> <span id="theme-text">Modo Escuro</span></button>
+                        <button onclick="openModal()"><i class="fas fa-user-edit"></i> Minha Conta</button>
+                        <a href="{{ url_for('logout') }}" style="color:var(--danger-color);"><i class="fas fa-sign-out-alt"></i> Sair</a>
+                    </div>
+                </div>
+            </header>
+
+            {% if current_user_role != 'vendedor' %}
+            <nav class="app-tab-controls">
+                <a href="{{ url_for('index') }}" class="tab-link {% if active_tab == 'dashboard' %}active{% endif %}"><i class="fas fa-tachometer-alt"></i> Geral</a>
+                <a href="{{ url_for('index', tab='locais') }}" class="tab-link {% if active_tab == 'locais' %}active{% endif %}"><i class="fas fa-warehouse"></i> Locais</a>
+                <a href="{{ url_for('index', tab='fornecedores') }}" class="tab-link {% if active_tab == 'fornecedores' %}active{% endif %}"><i class="fas fa-truck"></i> Fornecedores</a>
+                {% if current_user_role in ['admin', 'gestor'] %}
+                <a href="{{ url_for('index', tab='usuarios') }}" class="tab-link {% if active_tab == 'usuarios' %}active{% endif %}"><i class="fas fa-users-cog"></i> Usuários</a>
+                <a href="{{ url_for('index', tab='relatorios') }}" class="tab-link {% if active_tab == 'relatorios' %}active{% endif %}"><i class="fas fa-chart-bar"></i> Relatórios</a>
+                {% endif %}
+            </nav>
+            {% else %}
+            <nav class="app-tab-controls">
+                <a href="{{ url_for('index', tab='produtos') }}" class="tab-link {% if active_tab == 'produtos' %}active{% endif %}"><i class="fas fa-box-open"></i> Produtos</a>
+                <a href="{{ url_for('index', tab='reabastecimentos') }}" class="tab-link {% if active_tab == 'reabastecimentos' %}active{% endif %} {% if alertas_reabastecimento %}has-notification{% endif %}"><i class="fas fa-arrow-up-short-wide"></i> Atualizações <i class="fas fa-bell notification-bell" aria-hidden="true"></i>{% if alertas_reabastecimento %}<span class="notification-pill" aria-label="{{ alertas_reabastecimento|length }} novas atualizações">{{ alertas_reabastecimento|length }}</span>{% endif %}</a>
+            </nav>
+            {% endif %}
+
+            {% if current_user_role == 'vendedor' %}
+            <main>
+                {% if alertas_reabastecimento and active_tab != 'reabastecimentos' %}
+                <div class="form-container reabastecimento-alert" style="margin-bottom:20px;">
+                    <h2><i class="fas fa-bell"></i> {{ alertas_reabastecimento|length }} nova(s) atualização(ões) de reabastecimento</h2>
+                    <p>Confira as movimentações recentes na aba de atualizações.</p>
+                </div>
+                {% endif %}
+                {% if active_tab == 'reabastecimentos' %}
+                {% if alertas_reabastecimento %}
+                <div class="form-container reabastecimento-alert" style="margin-bottom:20px;">
+                    <h2><i class="fas fa-check-circle"></i> Reabastecimento realizado</h2>
+                    <ul>
+                        {% for alerta in alertas_reabastecimento %}
+                        {% set quantidade_reabastecida = (alerta.quantidade_nova or 0) - (alerta.quantidade_anterior or 0) %}
+                        <li class="reabastecimento-item">
+                            <strong>{{ alerta.produto_nome }}</strong> foi reabastecido com <span class="reabastecimento-quantidade">+{{ quantidade_reabastecida }}</span> unidade(s).
+                            <div class="reabastecimento-meta">Estoque atual: <strong>{{ alerta.quantidade_nova if alerta.quantidade_nova is not none else 0 }}</strong></div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% else %}
+                <div class="form-container">
+                    <h2><i class="fas fa-info-circle"></i> Nenhuma atualização de reabastecimento</h2>
+                    <p>Não há itens reabastecidos recentemente para exibir.</p>
+                </div>
+                {% endif %}
+                {% else %}
+                <div class="vendedor-grid">
+                    {% for produto in produtos %}
+                    <div class="product-card">
+                        <div>
+                            <h3>{{ produto.nome }}</h3>
+                            <div class="location"><i class="fas fa-map-marker-alt"></i> {{ produto.local_nome or 'N/A' }}</div>
+                        </div>
+                        <div>
+                            <div class="stock-display"><div class="label">Estoque</div><div class="value">{{ produto.quantidade }}</div></div>
+                            <form action="{{ url_for('realizar_saida', produto_id=produto.id) }}" method="POST" class="stock-action">
+                                <input type="number" name="quantidade_saida" min="1" max="{{ produto.quantidade }}" required>
+                                <button type="submit">Baixar</button>
+                            </form>
+                            {% if produto.quantidade < (produto.estoque_min or 0) and produto.quantidade > 0 %}
+                            <div style="margin-top:10px; padding:8px 10px; border-radius:6px; background:#fff3cd; color:#856404; font-size:0.95em; border:1px solid #ffeeba;">
+                                <i class="fas fa-exclamation-triangle"></i> Estoque baixo: este item está abaixo do mínimo definido.
+                            </div>
+                            {% endif %}
+                            {% if produto.quantidade <= 1 %}
+                            <div style="margin-top:10px; padding:8px 10px; border-radius:6px; background:#fff3cd; color:#856404; font-size:0.95em; border:1px solid #ffeeba;">
+                                <i class="fas fa-exclamation-triangle"></i> Este item acabou no estoque.
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </main>
+            {% else %}
+            
+            <div id="dashboard-content" class="tab-content {% if active_tab == 'dashboard' %}active{% endif %}">
+                <main>
+                    <div class="dashboard-grid" style="margin-bottom:30px;">
+                        <div class="card item-count"><h2>Total</h2><p class="big-number">{{ total_itens }}</p></div>
+                        <div class="card low-stock"><h2>Alerta</h2><p class="big-number">{{ estoque_baixo_count }}</p></div>
+                    </div>
+
+                    {% if itens_estoque_baixo %}
+                    <div class="form-container" style="border-left:5px solid var(--danger-color);">
+                        <h2><i class="fas fa-exclamation-triangle" style="color:var(--danger-color);"></i> Itens em estoque baixo</h2>
+                        <ul>
+                            {% for item in itens_estoque_baixo %}
+                            <li style="margin-bottom:8px;"><strong>{{ item.nome }}</strong> — estoque: {{ item.quantidade }} (mínimo: {{ item.estoque_min }})</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+
+                    {% if current_user_role in ['vendedor','gestor'] and alertas_reabastecimento %}
+                    <div class="form-container reabastecimento-alert">
+                        <h2><i class="fas fa-check-circle"></i> Reabastecimento realizado</h2>
+                        <ul>
+                            {% for alerta in alertas_reabastecimento %}
+                            {% set quantidade_reabastecida = (alerta.quantidade_nova or 0) - (alerta.quantidade_anterior or 0) %}
+                            <li class="reabastecimento-item">
+                                <strong>{{ alerta.produto_nome }}</strong> foi reabastecido com <span class="reabastecimento-quantidade">+{{ quantidade_reabastecida }}</span> unidade(s).
+                                <div class="reabastecimento-meta">Estoque atual: <strong>{{ alerta.quantidade_nova if alerta.quantidade_nova is not none else 0 }}</strong></div>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+
+                    <div class="form-container">
+                        <h2>{{ 'Editando Produto' if produto_para_editar else 'Novo Produto' }}</h2>
+                        <form action="{{ url_for('editar_produto', produto_id=produto_para_editar.id) if produto_para_editar else url_for('adicionar_produto') }}" method="POST">
+                            <div class="form-group"><label>Nome</label><input type="text" name="nome" value="{{ produto_para_editar.nome if produto_para_editar else '' }}" required></div>
+                            <div class="form-group"><label>Qtd</label><input type="number" name="quantidade" value="{{ produto_para_editar.quantidade if produto_para_editar else '' }}" required></div>
+                            
+                            <div class="form-group">
+                                <label>Local de Armazenamento</label>
+                                <select name="local_id">
+                                    <option value="0">Sem local definido</option>
+                                    {% for l in locais %}
+                                    <option value="{{ l.id }}" {% if produto_para_editar and produto_para_editar.local_id == l.id %}selected{% endif %}>{{ l.nome }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="form-group"><label>Mínimo</label><input type="number" name="estoque_min" value="{{ produto_para_editar.estoque_min if produto_para_editar else '10' }}" required></div>
+                            {% if current_user_role in ['admin','gestor'] %}
+                            <div class="form-group"><label>Unidades recebidas no reabastecimento</label><input type="number" name="quantidade_reabastecida" min="0" value="0" placeholder="Ex.: 20"></div>
+                            {% endif %}
+                            <div class="form-group"><label>Fornecedor</label>
+                                <select name="fornecedor_id"><option value="0">Nenhum</option>{% for f in fornecedores %}<option value="{{ f.id }}" {% if produto_para_editar and produto_para_editar.fornecedor_id == f.id %}selected{% endif %}>{{ f.nome }}</option>{% endfor %}</select>
+                            </div>
+                            <div class="form-group"><label>Gestor</label>
+                                <select name="gestor_id"><option value="0">Nenhum</option>{% for u in usuarios %}<option value="{{ u.id }}" {% if produto_para_editar and produto_para_editar.gestor_id == u.id %}selected{% endif %}>{{ u.nome }}</option>{% endfor %}</select>
+                            </div>
+                            <button type="submit" class="btn-submit">Salvar</button>
+                            {% if produto_para_editar %}<a href="{{ url_for('index') }}" class="btn-cancel">Cancelar</a>{% endif %}
+                        </form>
+                    </div>
+
+                    <div class="table-container">
+                        <table>
+                            <thead><tr><th>ID</th><th>Nome</th><th>Local</th><th>Qtd</th><th>Ações</th></tr></thead>
+                            <tbody>
+                                {% for p in produtos %}
+                                <tr>
+                                    <td>{{ p.id }}</td>
+                                    <td>{{ p.nome }}</td>
+                                    <td>
+                                        {% if p.local_nome %}<span style="background:rgba(52,152,219,0.1); color:var(--accent-color); padding:2px 8px; border-radius:10px; font-size:0.9em;">{{ p.local_nome }}</span>
+                                        {% else %}-{% endif %}
+                                    </td>
+                                    <td>{{ p.quantidade }}</td>
+                                    <td class="actions">
+                                        <a href="{{ url_for('index', edit_produto=p.id) }}" class="btn-edit"><i class="fas fa-edit"></i></a>
+                                        <form action="{{ url_for('remover_produto', produto_id=p.id) }}" method="POST" style="display:inline;"><button type="submit" class="btn-delete"><i class="fas fa-trash"></i></button></form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </main>
+            </div>
+
+            <div id="relatorios-content" class="tab-content {% if active_tab == 'relatorios' %}active{% endif %}">
+                <main>
+                    <div class="form-container">
+                        <h2><i class="fas fa-history"></i> Histórico de movimentação e alterações</h2>
+                        <p style="color:var(--text-secondary); margin-top:-5px;">Veja quem cadastrou itens, quem solicitou/baixou itens, quem alterou dados e quando houve movimentação entre setores ou galpões.</p>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Item</th>
+                                    <th>Ação</th>
+                                    <th>Usuário</th>
+                                    <th>Perfil</th>
+                                    <th>Origem / Destino</th>
+                                    <th>Quantidade</th>
+                                    <th>Detalhes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in historico_movimentacoes %}
+                                <tr>
+                                    <td>{{ item.criado_em.strftime('%d/%m/%Y %H:%M') if item.criado_em else '-' }}</td>
+                                    <td>{{ item.produto_nome or item.produto_id }}</td>
+                                    <td>
+                                        {% if item.tipo == 'cadastro' %}<span style="background:#e8f5e9; color:#2e7d32; padding:2px 8px; border-radius:10px;">Cadastro</span>
+                                        {% elif item.tipo == 'alteracao' %}<span style="background:#e3f2fd; color:#1565c0; padding:2px 8px; border-radius:10px;">Alteração</span>
+                                        {% elif item.tipo == 'saida' %}<span style="background:#fff3e0; color:#ef6c00; padding:2px 8px; border-radius:10px;">Solicitação</span>
+                                        {% elif item.tipo == 'movimentacao' %}<span style="background:#f3e5f5; color:#7b1fa2; padding:2px 8px; border-radius:10px;">Movimentação</span>
+                                        {% else %}<span style="background:#f5f5f5; color:#616161; padding:2px 8px; border-radius:10px;">{{ item.tipo }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ item.usuario_nome or '-' }}</td>
+                                    <td>{{ item.usuario_cargo or '-' }}</td>
+                                    <td>{{ item.local_origem or '-' }}{% if item.local_destino %} → {{ item.local_destino }}{% endif %}</td>
+                                    <td>{{ item.quantidade_anterior if item.quantidade_anterior is not none else '-' }} → {{ item.quantidade_nova if item.quantidade_nova is not none else '-' }}</td>
+                                    <td>{{ item.descricao or '-' }}</td>
+                                </tr>
+                                {% else %}
+                                <tr><td colspan="8" style="text-align:center; color:var(--text-secondary);">Nenhum registro encontrado.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </main>
+            </div>
+
+            <div id="locais-content" class="tab-content {% if active_tab == 'locais' %}active{% endif %}">
+                <main>
+                    <div class="form-container">
+                        <h2>{{ 'Editando Local' if local_para_editar else 'Novo Local' }}</h2>
+                        <form action="{{ url_for('editar_local', local_id=local_para_editar.id) if local_para_editar else url_for('adicionar_local') }}" method="POST">
+                            <div class="form-group"><label>Nome do Local (ex: Prateleira A1, Depósito)</label><input type="text" name="nome" value="{{ local_para_editar.nome if local_para_editar else '' }}" required></div>
+                            <button type="submit" class="btn-submit">Salvar</button>
+                            {% if local_para_editar %}<a href="{{ url_for('index', tab='locais') }}" class="btn-cancel">Cancelar</a>{% endif %}
+                        </form>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead><tr><th>ID</th><th>Nome</th><th>Ações</th></tr></thead>
+                            <tbody>
+                                {% for l in locais %}
+                                <tr>
+                                    <td>{{ l.id }}</td>
+                                    <td><i class="fas fa-map-marker-alt" style="color:var(--danger-color); margin-right:5px;"></i> {{ l.nome }}</td>
+                                    <td class="actions">
+                                        <a href="{{ url_for('index', tab='locais', edit_local=l.id) }}" class="btn-edit"><i class="fas fa-edit"></i></a>
+                                        <form action="{{ url_for('remover_local', local_id=l.id) }}" method="POST" style="display:inline;"><button type="submit" class="btn-delete"><i class="fas fa-trash"></i></button></form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </main>
+            </div>
+
+            <div id="fornecedores-content" class="tab-content {% if active_tab == 'fornecedores' %}active{% endif %}">
+                <main>
+                    <div class="form-container">
+                        <h2>{{ 'Editando Fornecedor' if fornecedor_para_editar else 'Novo Fornecedor' }}</h2>
+                        <form action="{{ url_for('editar_fornecedor', fornecedor_id=fornecedor_para_editar.id) if fornecedor_para_editar else url_for('adicionar_fornecedor') }}" method="POST">
+                            <div class="form-group"><label>Nome</label><input type="text" name="nome" value="{{ fornecedor_para_editar.nome if fornecedor_para_editar else '' }}" required></div>
+                            <div class="form-group"><label>Contato</label><input type="text" name="contato_nome" value="{{ fornecedor_para_editar.contato_nome if fornecedor_para_editar else '' }}"></div>
+                            <div class="form-group"><label>Telefone</label><input type="text" name="telefone" value="{{ fornecedor_para_editar.telefone if fornecedor_para_editar else '' }}"></div>
+                            <div class="form-group"><label>Email</label><input type="email" name="email" value="{{ fornecedor_para_editar.email if fornecedor_para_editar else '' }}"></div>
+                            <button type="submit" class="btn-submit">Salvar</button>
+                            {% if fornecedor_para_editar %}<a href="{{ url_for('index', tab='fornecedores') }}" class="btn-cancel">Cancelar</a>{% endif %}
+                        </form>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead><tr><th>Nome</th><th>Contato</th><th>Ações</th></tr></thead>
+                            <tbody>
+                                {% for f in fornecedores %}
+                                <tr>
+                                    <td>{{ f.nome }}</td><td>{{ f.contato_nome }}</td>
+                                    <td class="actions">
+                                        <a href="{{ url_for('index', tab='fornecedores', edit_fornecedor=f.id) }}" class="btn-edit"><i class="fas fa-edit"></i></a>
+                                        <form action="{{ url_for('remover_fornecedor', fornecedor_id=f.id) }}" method="POST" style="display:inline;"><button type="submit" class="btn-delete"><i class="fas fa-trash"></i></button></form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </main>
+            </div>
+
+            <div id="usuarios-content" class="tab-content {% if active_tab == 'usuarios' %}active{% endif %}">
+                <main>
+                    <div class="form-container">
+                        <h2>Gerenciar Usuários</h2>
+                        <form action="{{ url_for('editar_usuario', usuario_id=usuario_para_editar.id) if usuario_para_editar else url_for('adicionar_usuario') }}" method="POST">
+                            <div class="form-group"><label>Nome</label><input type="text" name="nome" value="{{ usuario_para_editar.nome if usuario_para_editar else '' }}" required></div>
+                            <div class="form-group"><label>Email</label><input type="email" name="email" value="{{ usuario_para_editar.email if usuario_para_editar else '' }}" required></div>
+                            <div class="form-group"><label>Telefone</label><input type="text" name="telefone" value="{{ usuario_para_editar.telefone if usuario_para_editar else '' }}"></div>
+                            <div class="form-group"><label>Senha</label><input type="password" name="senha"></div>
+                            <div class="form-group"><label>Cargo</label>
+                                <select name="cargo" {% if current_user_role == 'gestor' %}disabled{% endif %}>
+                                    <option value="vendedor" {% if usuario_para_editar and usuario_para_editar.cargo == 'vendedor' %}selected{% endif %}>Vendedor</option>
+                                    <option value="gestor" {% if usuario_para_editar and usuario_para_editar.cargo == 'gestor' %}selected{% endif %}>Gestor</option>
+                                    <option value="admin" {% if usuario_para_editar and usuario_para_editar.cargo == 'admin' %}selected{% endif %}>Admin</option>
+                                </select>
+                                {% if current_user_role == 'gestor' %}
+                                <small style="color:#8a6d3b; display:block; margin-top:6px;">Gestores não podem alterar o cargo de usuários administradores.</small>
+                                {% endif %}
+                            </div>
+                            <button type="submit" class="btn-submit">Salvar</button>
+                            {% if usuario_para_editar %}<a href="{{ url_for('index', tab='usuarios') }}" class="btn-cancel">Cancelar</a>{% endif %}
+                        </form>
+                    </div>
+                    <div class="table-container">
+                        {% if current_user_role == 'gestor' %}
+                        <div style="padding:12px 15px; background:#fff8e1; color:#8a6d3b; border-bottom:1px solid #f0d36e;">
+                            <i class="fas fa-info-circle"></i> Usuários com perfil de administrador não podem ser removidos ou alterados por gestores.
+                        </div>
+                        {% endif %}
+                        <table>
+                            <thead><tr><th>Nome</th><th>Email</th><th>Ações</th></tr></thead>
+                            <tbody>
+                                {% for u in usuarios %}
+                                <tr>
+                                    <td>{{ u.nome }}</td><td>{{ u.email }}</td>
+                                    <td class="actions">
+                                        <a href="{{ url_for('index', tab='usuarios', edit_usuario=u.id) }}" class="btn-edit"><i class="fas fa-edit"></i></a>
+                                        {% if current_user_role == 'gestor' and u.cargo == 'admin' %}
+                                        <button type="button" class="btn-delete" style="opacity:0.6; cursor:not-allowed;" title="Não permitido para gestores"><i class="fas fa-trash"></i></button>
+                                        {% else %}
+                                        <form action="{{ url_for('remover_usuario', usuario_id=u.id) }}" method="POST" style="display:inline;"><button type="submit" class="btn-delete"><i class="fas fa-trash"></i></button></form>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </main>
+            </div>
+            {% endif %}
+
+            <footer class="footer"><p>&copy; 2025 Sistema de Almoxarifado</p></footer>
+        </div>
+    </div>
+
+    <div id="accountModal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+            <h2>Minha Conta</h2>
+            <form action="{{ url_for('minha_conta') }}" method="POST">
+                <div class="form-group"><label>Novo E-mail</label><input type="email" name="email"></div>
+                <div class="form-group"><label>Telefone cadastrado</label><input type="text" name="telefone"></div>
+                <div class="form-group"><label>Nova Senha</label><input type="password" name="senha"></div>
+                <button type="submit" class="btn-submit">Atualizar</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="voiceAssistantPanel" class="assistant-panel" role="dialog" aria-label="Assistente por voz">
+        <h3><i class="fas fa-microphone-alt"></i> Assistente por voz</h3>
+        <p>Use comandos como “abrir usuários”, “abrir relatórios”, “abrir fornecedores”, “abrir locais”, “produtos” ou “sair”.</p>
+        <div id="assistantStatus" class="assistant-status" role="status" aria-live="polite">Pronto para ajudar.</div>
+        <div class="assistant-actions">
+            <button type="button" id="assistantToggleBtn" onclick="toggleVoiceAssistant()">Ativar microfone</button>
+            <button type="button" class="secondary" onclick="closeAssistantPanel()">Fechar</button>
+        </div>
+    </div>
+
+    <script>
+        function toggleMenu(){document.getElementById("dropdownMenu").classList.toggle("show");}
+        window.onclick=function(event){
+            if(!event.target.matches('.hamburger-btn')&&!event.target.matches('.fa-bars')){
+                var dd=document.getElementsByClassName("dropdown-menu");
+                for(var i=0;i<dd.length;i++){if(dd[i].classList.contains('show'))dd[i].classList.remove('show');}
+            }
+            if(event.target==document.getElementById('accountModal'))closeModal();
+        }
+        const themeButton=document.getElementById('theme-text'), themeIcon=document.getElementById('theme-icon');
+        if(localStorage.getItem('theme')==='dark'){document.body.classList.add('dark-mode');themeIcon.textContent='☀️';themeButton.textContent='Modo Claro';}
+        function toggleTheme(){
+            document.body.classList.toggle('dark-mode');
+            if(document.body.classList.contains('dark-mode')){localStorage.setItem('theme','dark');themeIcon.textContent='☀️';themeButton.textContent='Modo Claro';}
+            else{localStorage.setItem('theme','light');themeIcon.textContent='🌙';themeButton.textContent='Modo Escuro';}
+        }
+        function openModal(){document.getElementById('accountModal').style.display='flex';}
+        function closeModal(){document.getElementById('accountModal').style.display='none';}
+
+        let voiceRecognition = null;
+        let voiceAssistantActive = false;
+        const assistantPanel = document.getElementById('voiceAssistantPanel');
+        const assistantStatus = document.getElementById('assistantStatus');
+        const assistantToggleBtn = document.getElementById('assistantToggleBtn');
+
+        function speak(text){
+            if('speechSynthesis' in window){
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'pt-BR';
+                window.speechSynthesis.cancel();
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function setAssistantStatus(message){
+            if(assistantStatus) assistantStatus.textContent = message;
+        }
+
+        function closeAssistantPanel(){
+            if(assistantPanel) assistantPanel.classList.remove('show');
+            if(voiceRecognition && voiceAssistantActive){
+                voiceRecognition.stop();
+                voiceAssistantActive = false;
+            }
+            if(assistantToggleBtn) assistantToggleBtn.textContent = 'Ativar microfone';
+            setAssistantStatus('Assistente fechado.');
+        }
+
+        function toggleAssistantPanel(){
+            if(!assistantPanel) return;
+            assistantPanel.classList.toggle('show');
+            if(assistantPanel.classList.contains('show')){
+                setAssistantStatus('Pronto para ajudar.');
+            }
+        }
+
+        function handleVoiceCommand(command){
+            const text = command.toLowerCase();
+            if(text.includes('usuário') || text.includes('usuarios') || text.includes('usuários')){
+                window.location.href = '{{ url_for("index", tab="usuarios") }}';
+                return;
+            }
+            if(text.includes('relatório') || text.includes('relatorios') || text.includes('relatórios')){
+                window.location.href = '{{ url_for("index", tab="relatorios") }}';
+                return;
+            }
+            if(text.includes('fornecedor') || text.includes('fornecedores')){
+                window.location.href = '{{ url_for("index", tab="fornecedores") }}';
+                return;
+            }
+            if(text.includes('local') || text.includes('locais')){
+                window.location.href = '{{ url_for("index", tab="locais") }}';
+                return;
+            }
+            if(text.includes('produto') || text.includes('produtos') || text.includes('painel')){
+                window.location.href = '{{ url_for("index") }}';
+                return;
+            }
+            if(text.includes('sair') || text.includes('logout')){
+                window.location.href = '{{ url_for("logout") }}';
+                return;
+            }
+            if(text.includes('ajuda') || text.includes('comando')){
+                speak('Você pode dizer abrir usuários, abrir relatórios, abrir fornecedores, abrir locais, abrir produtos ou sair.');
+                setAssistantStatus('Comandos disponíveis: usuários, relatórios, fornecedores, locais, produtos e sair.');
+                return;
+            }
+            speak('Comando não reconhecido. Diga ajuda para ouvir as opções.');
+            setAssistantStatus('Comando não reconhecido.');
+        }
+
+        function toggleVoiceAssistant(){
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if(!SpeechRecognition){
+                setAssistantStatus('Seu navegador não suporta reconhecimento por voz.');
+                speak('Seu navegador não possui suporte para reconhecimento por voz.');
+                return;
+            }
+            if(!voiceRecognition){
+                voiceRecognition = new SpeechRecognition();
+                voiceRecognition.lang = 'pt-BR';
+                voiceRecognition.continuous = false;
+                voiceRecognition.interimResults = false;
+                voiceRecognition.onstart = function(){
+                    voiceAssistantActive = true;
+                    if(assistantToggleBtn) assistantToggleBtn.textContent = 'Parar microfone';
+                    setAssistantStatus('Ouvindo... fale um comando.');
+                };
+                voiceRecognition.onresult = function(event){
+                    const transcript = event.results[event.resultIndex][0].transcript.trim();
+                    setAssistantStatus('Comando reconhecido: ' + transcript);
+                    handleVoiceCommand(transcript);
+                };
+                voiceRecognition.onerror = function(event){
+                    setAssistantStatus('Não foi possível ouvir.');
+                    speak('Não foi possível ouvir o seu comando.');
+                    voiceAssistantActive = false;
+                    if(assistantToggleBtn) assistantToggleBtn.textContent = 'Ativar microfone';
+                };
+                voiceRecognition.onend = function(){
+                    if(voiceAssistantActive){
+                        voiceRecognition.start();
+                    } else {
+                        if(assistantToggleBtn) assistantToggleBtn.textContent = 'Ativar microfone';
+                        setAssistantStatus('Microfone desligado.');
+                    }
+                };
+            }
+
+            if(voiceAssistantActive){
+                voiceRecognition.stop();
+                voiceAssistantActive = false;
+                if(assistantToggleBtn) assistantToggleBtn.textContent = 'Ativar microfone';
+                setAssistantStatus('Microfone desligado.');
+            } else {
+                assistantPanel.classList.add('show');
+                voiceRecognition.start();
+                speak('Assistente ativado.');
+            }
+        }
+    </script>
+</body>
+</html>

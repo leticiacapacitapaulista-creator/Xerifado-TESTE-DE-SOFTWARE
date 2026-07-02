@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  # 1. Aplicação Principal
+  web:
+    build: .
+    command: python app.py
+    ports:
+      - "8000:8080"
+    depends_on:
+      - db
+      - email_service
+    environment:
+      - IP=0.0.0.0
+      - PORT=8080
+      - MYSQL_HOST=db
+      - EMAIL_SERVICE_URL=http://email_service:5001/send_email
+
+  # 2. Microserviço de Email
+  email_service:
+    build: .
+    command: python email_service.py
+    ports:
+      - "5001:5001"
+    environment:
+      # COLOQUE AQUI SUA SENHA DE APP DO GMAIL
+      - GMAIL_APP_SENHA=sua_senha_de_app_aqui 
+
+  # 3. Banco de Dados
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: admin123
+      MYSQL_DATABASE: almoxarifado_db
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+volumes:
+  mysql_data:

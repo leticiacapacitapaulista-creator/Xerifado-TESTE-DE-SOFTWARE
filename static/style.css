@@ -1,0 +1,191 @@
+/* Definições Gerais e Reset Básico */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f7f6; /* Cor de fundo suave */
+    display: flex; /* Para organizar o sidebar e o conteúdo principal */
+    min-height: 100vh;
+}
+
+/* --- Barra Lateral (Sidebar) --- */
+.sidebar {
+    width: 250px;
+    background-color: #2c3e50; /* Azul escuro */
+    color: white;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+}
+
+.logo {
+    padding: 20px;
+    text-align: center;
+    border-bottom: 1px solid #34495e;
+}
+
+.logo h3 {
+    margin: 0;
+    font-size: 1.5em;
+}
+
+.sidebar nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar nav ul li a {
+    display: block;
+    padding: 15px 20px;
+    text-decoration: none;
+    color: #ecf0f1; /* Cinza claro */
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.sidebar nav ul li a i {
+    margin-right: 10px;
+}
+
+.sidebar nav ul li a:hover,
+.sidebar nav ul li.active a {
+    background-color: #3498db; /* Azul vibrante */
+    color: white;
+}
+
+/* --- Conteúdo Principal (Main Content) --- */
+.main-content {
+    flex-grow: 1; /* Ocupa o restante do espaço */
+    display: flex;
+    flex-direction: column;
+}
+
+/* Cabeçalho */
+.header {
+    background-color: white;
+    padding: 20px 30px;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 1.5em;
+    color: #333;
+}
+
+.user-info a {
+    color: #e74c3c; /* Vermelho para 'Sair' */
+    text-decoration: none;
+}
+
+/* Grade do Dashboard */
+.dashboard-grid {
+    padding: 30px;
+    display: grid;
+    /* Define 2 colunas com tamanho flexível */
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+    gap: 20px;
+    flex-grow: 1; /* Para que o grid ocupe o espaço e o footer fique embaixo */
+}
+
+/* Cards */
+.card {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.card h2 {
+    margin-top: 0;
+    font-size: 1.2em;
+    color: #2c3e50;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+/* Números Grandes dos Cards */
+.big-number {
+    font-size: 3em;
+    font-weight: bold;
+    color: #3498db; 
+    text-align: center;
+    margin: 10px 0;
+}
+
+/* Cores de Destaque */
+.item-count .big-number { color: #27ae60; } /* Verde */
+.low-stock .big-number { color: #e74c3c; } /* Vermelho */
+
+/* Lista de Atividades Recentes */
+.recent-activity ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.recent-activity ul li {
+    padding: 8px 0;
+    border-bottom: 1px dotted #ccc;
+    font-size: 0.9em;
+}
+
+.recent-activity ul li:last-child {
+    border-bottom: none;
+}
+
+/* Rodapé (Footer) */
+.footer {
+    padding: 15px;
+    text-align: center;
+    background-color: #ecf0f1;
+    color: #7f8c8d;
+    font-size: 0.8em;
+}
+
+/* Responsividade Básica (para telas menores) */
+@media (max-width: 768px) {
+    body {
+        flex-direction: column; /* Empilha sidebar e main-content */
+    }
+
+    .sidebar {
+        width: 100%; /* Sidebar ocupa toda a largura */
+        height: auto;
+        padding: 0;
+    }
+    
+    .sidebar nav ul {
+        display: flex; /* Transforma o menu em linha */
+        flex-wrap: wrap; /* Quebra linha se necessário */
+        justify-content: center;
+        border-top: 1px solid #34495e;
+    }
+    
+    .sidebar nav ul li {
+        flex: 1 1 auto; /* Permite que os itens cresçam/diminuam */
+        text-align: center;
+    }
+
+    .sidebar nav ul li a {
+        padding: 10px 15px;
+        font-size: 0.9em;
+    }
+
+    .header {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .user-info {
+        margin-top: 10px;
+    }
+
+    .dashboard-grid {
+        padding: 15px;
+    }
+}
