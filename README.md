@@ -1,207 +1,137 @@
-# Projeto Web Almoxarifado - Entrega Final
+📝 Sistema de Gerenciamento de Almoxarifado
+Este é um sistema web desenvolvido para o controle, monitoramento e gerenciamento de insumos e produtos de um Almoxarifado. O sistema conta com controle de níveis de acesso por cargos (Administrador, Gestor e Vendedor), cálculo automático de estoque baixo e envio automatizado de alertas de reabastecimento.
 
-Este projeto é uma aplicação web de controle de almoxarifado, desenvolvida em Python com Flask, utilizando MySQL, Docker e autenticação JWT baseada em cookies.
+O ambiente e o banco de dados são gerenciados usando o Docker, enquanto a suíte de testes de integração é executada na sua máquina local, comunicando-se diretamente com o banco de dados ativo no container.
 
-### O sistema permite:
+🚀 Tecnologias Utilizadas
+Python 3.14 — Linguagem base do ecossistema.
 
-##### -Controle de produtos e estoque
+Flask 1.3.0 — Micro-framework web para construção das rotas e lógica do servidor.
 
-##### -Cadastro de fornecedores
+MySQL — Banco de dados relacional para armazenamento de usuários, produtos e movimentações.
 
-##### -Gestão de usuários com níveis de permissão (admin, gestor, vendedor)
+Docker Desktop — Criação e isolamento do container de banco de dados.
 
-##### -Login seguro com senha criptografada
+Pytest 9.1.0 — Framework utilizado para a automação e execução da suíte de testes de integração.
 
-##### -Alertas automáticos de estoque baixo
+🛠️ Como Iniciar o Projeto (Docker Desktop)
+Siga o passo a passo abaixo para subir o banco de dados MySQL no Docker do seu computador:
 
+Abra o Docker Desktop no seu computador.
 
-# Arquitetura/Tecnologias deste Projeto
+Suba o container do banco de dados:
+Abra o terminal do seu Windows (PowerShell ou CMD) na raiz do projeto e execute:
 
-Flask → Backend e rotas
+PowerShell
+docker compose up -d
+Verifique se o banco está ativo:
+Você pode conferir pelo painel visual do Docker Desktop ou pelo comando:
 
-MySQL → Banco de dados
+PowerShell
+docker compose ps
+⚙️ Configuração para os Testes Unitários e de Integração
+Como os testes rodam diretamente no terminal do seu Windows, o Python precisa saber que o MySQL está acessível através do endereço local do seu próprio computador.
 
-JWT (flask-jwt-extended) → Autenticação e autorização
+Antes de rodar os testes, certifique-se de que a linha de configuração do Host no seu app.py está definida para usar o IP 127.0.0.1 como padrão quando executada fora do container:
 
-Docker / Docker Compose → Infraestrutura
+Python
+app.config['MYSQL_HOST'] = os.environ.get('MYSQL_HOST', '127.0.0.1')
+🧪 Suíte de Testes Automatizados (Pytest)
+Com o banco de dados ativo no Docker, você pode rodar os comandos abaixo diretamente no terminal do seu Windows (PS C:\Users\...). Os testes vão ler, gravar e validar as regras de negócio usando dados reais dentro do MySQL.
 
-Microserviço de Email → Alertas de estoque
+🌟 Comando para rodar TODOS os testes do projeto de uma vez:
+PowerShell
+pytest testes/ -v -s
+📦 Comandos de Testes por Arquivo e Isolados
+Se preferir validar seções específicas do projeto separadamente, utilize os comandos abaixo:
 
+1. Autenticação e Segurança (test_login.py)
+Valida o comportamento das rotas de login, renderização de templates HTML e as telas de recuperação/reset de senha integradas ao banco.
 
-# Autenticação e Segurança - Usando o JWT
+Geral do arquivo:
 
-As senhas são armazenadas usando hash seguro (werkzeug.security)
+PowerShell
+pytest testes/test_login.py -v -s
+Separado por Função:
 
-O login gera um JWT armazenado em cookie HTTPOnly
+PowerShell
+# Verifica se a página retorna HTML válido (Status 200)
+pytest testes/test_login.py::test_login_contem_html -v -s
 
-O token contém claims com:
+# Verifica exibição do formulário "Esqueci a Senha"
+pytest testes/test_login.py::test_esqueci_senha_exibe_formulario -v -s
 
-##### ID do usuário
+# Verifica o fluxo de solicitação de reset de senha
+pytest testes/test_login.py::test_solicitar_reset_senha_retorna_mensagem -v -s
 
-##### Nome
+# Valida tentativa de login com credenciais incorretas no banco
+pytest testes/test_login.py::test_login_credenciais_invalidas -v -s
+2. Níveis de Acesso e Cargos (test_permissoes_usuarios.py)
+Garante que as regras de privilégios entre Administradores, Gestores e Vendedores sejam respeitadas rigorosamente no sistema.
 
-##### Cargo (admin / gestor / vendedor)
+Geral do arquivo:
 
-### Cargos e Permissões
+PowerShell
+pytest testes/test_permissoes_usuarios.py -v -s
+Separado por Função:
 
-Criamos uma imagem ilustrativa de como é as permissões no sistema
+PowerShell
+# Valida bloqueio ao tentar remover usuários administradores
+pytest testes/test_permissoes_usuarios.py::test_mensagem_permissao_remocao_usuario_bloqueia_gestor_para_admin -v -s
 
-<img width="1024" height="329" alt="image" src="https://github.com/user-attachments/assets/0e449b20-ee06-44d9-bb3d-f981d628b095" />
+# Valida a lógica de quem possui permissão para editar perfis
+pytest testes/test_permissoes_usuarios.py::test_pode_editar_usuario_restringe_gestor_para_admin -v -s
+3. Regras de Negócio do Estoque (test_regras_estoque.py)
+Testa as funções matemáticas que controlam o estoque mínimo de segurança e a listagem de itens críticos.
 
-# JWT – Configuração
+Geral do arquivo:
 
-### Esta é a configuração em código do JWT:
+PowerShell
+pytest testes/test_regras_estoque.py -v -s
+Separado por Função:
 
-app.config['JWT_TOKEN_LOCATION'] = ['cookies']
+PowerShell
+# Valida gatilho quando o estoque atinge o nível mínimo
+pytest testes/test_regras_estoque.py::test_estoque_baixo_conta_quando_atinge_o_minimo -v -s
 
-app.config['JWT_COOKIE_CSRF_PROTECT'] = False
+# Garante filtragem correta apenas de itens com quantidades críticas
+pytest testes/test_regras_estoque.py::test_get_itens_estoque_baixo_retorna_apenas_itens_abaixo_do_minimo -v -s
 
-app.config['JWT_ACCESS_COOKIE_PATH'] = '/'
+# Valida inclusão de produtos marcados manualmente como "em falta"
+pytest testes/test_regras_estoque.py::test_get_itens_estoque_baixo_inclui_itens_solicitados_em_falta -v -s
+4. Endpoints e Rotas HTTP (test_rotas_http.py)
+Valida os códigos de resposta HTTP diretos gerados pelo servidor web do Flask.
 
-#### O token fica salvo em cookie
+Geral do arquivo:
 
-#### Rotas protegidas usam @jwt_required()
+PowerShell
+pytest testes/test_rotas_http.py -v -s
+Separado por Função / Filtro:
 
-### Handlers personalizados redirecionam para /login caso:
+PowerShell
+# Garante o retorno do erro padrão 404 para links inválidos
+pytest testes/test_rotas_http.py -k "rota_inexistente" -v -s
+5. Banco de Dados e Consultas (test_banco_mocks.py)
+Valida o comportamento das funções que interagem com e-mails de alerta e formatação de logs de auditoria históricos.
 
-##### Token ausente
+Geral do arquivo:
 
-##### Token expirado
+PowerShell
+pytest testes/test_banco_mocks.py -v -s
+Separado por Função:
 
-##### Token inválido
+PowerShell
+# Valida tratamento de dicionários para destinatários de alertas gerais
+pytest testes/test_banco_mocks.py::test_obter_destinatarios_alerta_aceita_cursor_com_dicionarios -v -s
 
-# Criação Automática do Usuário Admin
+# Valida emails de alerta focados em reabastecimento para os cargos responsáveis
+pytest testes/test_banco_mocks.py::test_obter_destinatarios_alerta_reabastecimento_inclui_gestor_e_vendedor -v -s
 
-## Na inicialização do sistema:
+# Testa a gravação da estrutura do histórico de movimentações (Log)
+pytest testes/test_banco_mocks.py::test_registrar_movimentacao_cria_registro_com_tipo_e_usuario -v -s
 
-### inicializar_admin()
+# Garante o filtro correto separando o tipo "reabastecimento" no histórico
+pytest testes/test_banco_mocks.py::test_get_alertas_reabastecimento_filtra_registros_reabastecimento -v -s
 
-## Se não existir um admin, o sistema cria:
-
-### Email: admin@sistema.com
-### Senha: admin123
-### Cargo: admin
-
-# Configuração do Banco de Dados
-
-As configurações são feitas via variáveis de ambiente:
-
-app.config['MYSQL_HOST'] = os.environ.get('MYSQL_HOST', 'db')
-
-app.config['MYSQL_USER'] = os.environ.get('MYSQL_USER', 'root')
-
-app.config['MYSQL_PASSWORD'] = os.environ.get('MYSQL_ROOT_PASSWORD', 'admin123')
-
-app.config['MYSQL_DATABASE'] = os.environ.get('MYSQL_DATABASE', 'almoxarifado_db')
-
-#### Isso permite rodar localmente ou em Docker/EC2 sem alterar o código
-
-# Construimos - Decoradores de Permissão
-
-### O decorador: 
-
-#### @role_required(['admin', 'gestor'])
-
-Faz o seguinte: 
-
-##### 1- Lê o cargo do JWT
-##### 2- Compara com os cargos permitios e por fim
-##### 3- Bloqueia acesso indevido (erro 403)
-
-# Dashboard Principal
-
-### Rota protegida:
-
-#### @app.route('/')
-#### @jwt_required()
-
-### Funcionalidades:
-
-#### Dashboard de estoque
-
-#### Produtos
-
-#### Fornecedores
-
-#### Usuários (somente admin)
-
-### A interface esconde botões conforme o cargo do usuário.
-
-# Alerta de Estoque Baixo
-
-### Quando a quantidade fica abaixo do mínimo:
-
-#### disparar_alerta_estoque_baixo()
-
-### O que isso significa:
-
-#### Executa em thread separada
-
-#### Chama microserviço de email
-
-
-# CI/CD com GitHub Actions + Docker + AWS EC2
-
-Este projeto utiliza um pipeline de CI/CD (Integração Contínua e Deploy Contínuo) para automatizar o processo de atualização da aplicação em produção.
-
-Sempre que há um push no repositório, o sistema é automaticamente atualizado no servidor AWS EC2, utilizando Docker.
-
-## Estrutura do CI/CD no Projeto
-
-Foi criada a seguinte estrutura dentro do repositório:
-
-<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/d867de2f-3618-4618-9bcf-1499872d99e4" />
-
-
-### Esse arquivo é responsável por definir todas as etapas do deploy automático
-
-## Configuração de Segurança (Secrets)
-
-Para garantir segurança no acesso ao servidor EC2, foram configuradas variáveis secretas no GitHub:
-
-EC2_HOST: Endereço IP público da instância EC2
-
-EC2_USER: Usuário padrão da instância (ex: ec2-user)
-
-EC2_SSH_KEY: Chave privada SSH usada para autenticação
-
-##A implementação do CI/CD neste projeto permite que qualquer alteração enviada ao repositório seja automaticamente refletida no servidor, tornando o processo de desenvolvimento mais ágil, seguro e profissional.
-
-# SEGURITY GROUP
-
-Criamos um Grupo Seguro para a instância do projeto, com as configurações (figuras ilustrativas abaixo:
-
-<img width="1130" height="357" alt="image" src="https://github.com/user-attachments/assets/e1e637b4-b5d6-48a5-89bb-ea31ac69c944" />
-
-## REGRAS DE ENTRADA:
-
-<img width="1100" height="191" alt="image" src="https://github.com/user-attachments/assets/c26e9335-f7e7-4cdb-8106-92938c352531" />
-
-
-## REGRAS DE SAIDA:
-
-<img width="1140" height="231" alt="image" src="https://github.com/user-attachments/assets/5130c1c0-6e04-4646-a100-7bdd116bc8b2" />
-
-
-# IP ELASTICO - IP FIXO
-
-Decidimos criar um IP Elástico, para sempre ser o mesmo IP, sem precisar que o EC2, toda vez que inicializar o Docker, precise mudar de IP.
-
-http://13.219.65.108:8000/login
-
-<img width="1121" height="208" alt="image" src="https://github.com/user-attachments/assets/99e6221e-d20d-4caf-9198-a38be707a765" />
-
-# Conclusão
-
-Então este projeto de almoxarifado, demonstra:
-
-Arquitetura segura
-
-Controle de acesso por cargo
-
-Boas práticas com Flask
-
-Uso real de JWT + Cookies
-
-Integração com microserviços
-
+🛑 Parar o Ambiente
+Para encerrar os serviços do banco de dados e fechar os containers do Docker de forma limpa:
