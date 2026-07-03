@@ -45,9 +45,9 @@ Antes de rodar os testes, certifique-se de que a linha de configuração do Host
 
 Python
 
-### app.config['MYSQL_HOST'] = os.environ.get('MYSQL_HOST', '127.0.0.1')
+###### app.config['MYSQL_HOST'] = os.environ.get('MYSQL_HOST', '127.0.0.1')
 
-### O link que será gerado do Docker sobre o projeto é: http://localhost:8000/login
+#### O link que será gerado do Docker sobre o projeto é: http://localhost:8000/login
 
 
 ## Suíte de Testes Automatizados (Pytest)
