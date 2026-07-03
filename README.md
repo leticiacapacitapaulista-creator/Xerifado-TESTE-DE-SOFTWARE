@@ -58,7 +58,7 @@ Com o banco de dados ativo no Docker, você pode rodar os comandos abaixo direta
 
 ### pytest testes/ -v -s
 
-# OBS: EMERGÊNCIA PARA CASO O VENV NÃO FUNCIONAR CORRETAMENTE:
+##### OBS: EMERGÊNCIA PARA CASO O VENV NÃO FUNCIONAR CORRETAMENTE:
 deactivate                       
 >> Remove-Item -Recurse -Force .venv
 >> python -m venv .venv
