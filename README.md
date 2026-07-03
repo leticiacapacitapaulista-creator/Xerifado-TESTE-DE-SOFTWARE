@@ -29,13 +29,13 @@ Abra o Docker Desktop no seu computador.
 Suba o container do banco de dados:
 Abra o terminal do seu Windows (PowerShell ou CMD) na raiz do projeto e execute:
 
-# docker compose up -d
+### docker compose up -d
 
 Verifique se o banco está ativo
 
 Você pode conferir pelo painel visual do Docker Desktop ou pelo comando:
 
-# docker compose ps
+### docker compose ps
 
 ## ⚙️ Configuração para os Testes Unitários e de Integração
 
@@ -45,7 +45,10 @@ Antes de rodar os testes, certifique-se de que a linha de configuração do Host
 
 Python
 
-app.config['MYSQL_HOST'] = os.environ.get('MYSQL_HOST', '127.0.0.1')
+### app.config['MYSQL_HOST'] = os.environ.get('MYSQL_HOST', '127.0.0.1')
+
+### O link que será gerado do Docker sobre o projeto é: http://localhost:8000/login
+
 
 ## Suíte de Testes Automatizados (Pytest)
 
@@ -53,7 +56,7 @@ Com o banco de dados ativo no Docker, você pode rodar os comandos abaixo direta
 
 ## 🌟 Comando para rodar TODOS os testes do projeto de uma vez:
 
-# pytest testes/ -v -s
+### pytest testes/ -v -s
 
 # OBS: EMERGÊNCIA PARA CASO O VENV NÃO FUNCIONAR CORRETAMENTE:
 deactivate                       
@@ -74,20 +77,20 @@ Valida o comportamento das rotas de login, renderização de templates HTML e as
 
 Comando Geral do arquivo:
 
-# pytest testes/test_login.py -v -s
+### pytest testes/test_login.py -v -s
 
 Comando Separado por Função:
 
-# Verifica se a página retorna HTML válido (Status 200)
+### Verifica se a página retorna HTML válido (Status 200)
 pytest testes/test_login.py::test_login_contem_html -v -s
 
-# Verifica exibição do formulário "Esqueci a Senha"
+### Verifica exibição do formulário "Esqueci a Senha"
 pytest testes/test_login.py::test_esqueci_senha_exibe_formulario -v -s
 
-# Verifica o fluxo de solicitação de reset de senha
+### Verifica o fluxo de solicitação de reset de senha
 pytest testes/test_login.py::test_solicitar_reset_senha_retorna_mensagem -v -s
 
-# Valida tentativa de login com credenciais incorretas no banco
+### Valida tentativa de login com credenciais incorretas no banco
 pytest testes/test_login.py::test_login_credenciais_invalidas -v -s
 
 
@@ -96,14 +99,14 @@ Garante que as regras de privilégios entre Administradores, Gestores e Vendedor
 
 Comando Geral do arquivo:
 
-# pytest testes/test_permissoes_usuarios.py -v -s
+### pytest testes/test_permissoes_usuarios.py -v -s
 
 Comando Separado por Função:
 
-# Valida bloqueio ao tentar remover usuários administradores
+### Valida bloqueio ao tentar remover usuários administradores
 pytest testes/test_permissoes_usuarios.py::test_mensagem_permissao_remocao_usuario_bloqueia_gestor_para_admin -v -s
 
-# Valida a lógica de quem possui permissão para editar perfis
+### Valida a lógica de quem possui permissão para editar perfis
 pytest testes/test_permissoes_usuarios.py::test_pode_editar_usuario_restringe_gestor_para_admin -v -s
 
 
@@ -112,17 +115,17 @@ Testa as funções matemáticas que controlam o estoque mínimo de segurança e 
 
 Comando Geral do arquivo:
 
-# pytest testes/test_regras_estoque.py -v -s
+### pytest testes/test_regras_estoque.py -v -s
 
 Comando Separado por Função:
 
-# Valida gatilho quando o estoque atinge o nível mínimo
+### Valida gatilho quando o estoque atinge o nível mínimo
 pytest testes/test_regras_estoque.py::test_estoque_baixo_conta_quando_atinge_o_minimo -v -s
 
-# Garante filtragem correta apenas de itens com quantidades críticas
+### Garante filtragem correta apenas de itens com quantidades críticas
 pytest testes/test_regras_estoque.py::test_get_itens_estoque_baixo_retorna_apenas_itens_abaixo_do_minimo -v -s
 
-# Valida inclusão de produtos marcados manualmente como "em falta"
+### Valida inclusão de produtos marcados manualmente como "em falta"
 pytest testes/test_regras_estoque.py::test_get_itens_estoque_baixo_inclui_itens_solicitados_em_falta -v -s
 
 
@@ -131,11 +134,11 @@ Valida os códigos de resposta HTTP diretos gerados pelo servidor web do Flask.
 
 Comando Geral do arquivo:
 
-# pytest testes/test_rotas_http.py -v -s
+### pytest testes/test_rotas_http.py -v -s
 
 Comando Separado por Função / Filtro:
 
-# Garante o retorno do erro padrão 404 para links inválidos
+### Garante o retorno do erro padrão 404 para links inválidos
 pytest testes/test_rotas_http.py -k "rota_inexistente" -v -s
 
 ## 5. Banco de Dados e Consultas (test_banco_mocks.py)
@@ -143,18 +146,18 @@ Valida o comportamento das funções que interagem com e-mails de alerta e forma
 
 Comando Geral do arquivo:
 
-# pytest testes/test_banco_mocks.py -v -s
+### pytest testes/test_banco_mocks.py -v -s
 
 Comando Separado por Função:
 
-# Valida tratamento de dicionários para destinatários de alertas gerais
+### Valida tratamento de dicionários para destinatários de alertas gerais
 pytest testes/test_banco_mocks.py::test_obter_destinatarios_alerta_aceita_cursor_com_dicionarios -v -s
 
-# Valida emails de alerta focados em reabastecimento para os cargos responsáveis
+### Valida emails de alerta focados em reabastecimento para os cargos responsáveis
 pytest testes/test_banco_mocks.py::test_obter_destinatarios_alerta_reabastecimento_inclui_gestor_e_vendedor -v -s
 
-# Testa a gravação da estrutura do histórico de movimentações (Log)
+### Testa a gravação da estrutura do histórico de movimentações (Log)
 pytest testes/test_banco_mocks.py::test_registrar_movimentacao_cria_registro_com_tipo_e_usuario -v -s
 
-# Garante o filtro correto separando o tipo "reabastecimento" no histórico
+### Garante o filtro correto separando o tipo "reabastecimento" no histórico
 pytest testes/test_banco_mocks.py::test_get_alertas_reabastecimento_filtra_registros_reabastecimento -v -s
