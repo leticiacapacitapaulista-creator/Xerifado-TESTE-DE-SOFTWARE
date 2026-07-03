@@ -1,13 +1,22 @@
 ## INSTITUTO FEDERAL DE PERNAMBUCO - CAMPUS PAULISTA
-### CURSO: ADS -  TESTE DE SOFTWARE
 
-### ALUNOS: LETICIA RENATA;  HUDSON PESSOA
-### GIT'S: leticiacapacitapaulista-creator; 
+### 🎓 Informações Acadêmicas
 
-## 📝 Sistema de Gerenciamento de Almoxarifado
+#### CURSO: ADS -  TESTE DE SOFTWARE
+
+#### ALUNOS: LETICIA RENATA;  HUDSON PESSOA
+
+#### GIT'S: leticiacapacitapaulista-creator; 
+
+---
+
+## 📝 Sistema de Gerenciamento de Almoxarifado - Xerifado
+
 Este é um sistema web desenvolvido para o controle, monitoramento e gerenciamento de insumos e produtos de um Almoxarifado. O sistema conta com controle de níveis de acesso por cargos (Administrador, Gestor e Vendedor), cálculo automático de estoque baixo e envio automatizado de alertas de reabastecimento.
 
 O ambiente e o banco de dados são gerenciados usando o Docker, enquanto a suíte de testes de integração é executada na sua máquina local, comunicando-se diretamente com o banco de dados ativo no container.
+
+---
 
 ## 🚀 Tecnologias Utilizadas
 
@@ -21,9 +30,11 @@ Docker Desktop — Criação e isolamento do container de banco de dados.
 
 Pytest 9.1.0 — Framework utilizado para a automação e execução da suíte de testes de integração.
 
-## 🛠️ Como Iniciar o Projeto (Docker Desktop)
-Siga o passo a passo abaixo para subir o banco de dados MySQL no Docker do seu computador:
+---
 
+## 🛠️ Como Iniciar o Projeto (Docker Desktop)
+
+Siga o passo a passo abaixo para subir o banco de dados MySQL no Docker do seu computador:
 Abra o Docker Desktop no seu computador.
 
 Suba o container do banco de dados:
@@ -31,13 +42,15 @@ Abra o terminal do seu Windows (PowerShell ou CMD) na raiz do projeto e execute:
 
 ### docker compose up -d
 
-Verifique se o banco está ativo
-
-Você pode conferir pelo painel visual do Docker Desktop ou pelo comando:
+Verifique se o banco está ativo, Você pode conferir pelo painel visual do Docker Desktop ou pelo comando:
 
 ### docker compose ps
 
+---
+
 ## ⚙️ Configuração para os Testes Unitários e de Integração
+
+Foram desenvolvidos testes automatizados utilizando o framework **Pytest**, com o objetivo de validar rotas e comportamentos da aplicação.
 
 Como os testes rodam diretamente no terminal do seu Windows, o Python precisa saber que o MySQL está acessível através do endereço local do seu próprio computador.
 
@@ -49,6 +62,7 @@ Python
 
 #### O link que será gerado do Docker sobre o projeto é: http://localhost:8000/login
 
+---
 
 ## 📦Suíte de Testes Automatizados (Pytest)
 
@@ -65,21 +79,22 @@ deactivate
 >> .\.venv\Scripts\Activate.ps1
 >> python -m pip install -r requirements.txt
 >> python -m pip install pytest
->> 
+
+--- 
 
 ## 📦 Comandos de Testes por Arquivo e Isolados
 
-Se preferir validar seções específicas do projeto separadamente, utilize os comandos abaixo.
+**Se preferir validar seções específicas do projeto separadamente, utilize os comandos abaixo.**
 
-## 1. Autenticação e Segurança (test_login.py)
+### CT01 - Autenticação e Segurança (test_login.py)
 
 Valida o comportamento das rotas de login, renderização de templates HTML e as telas de recuperação/reset de senha integradas ao banco.
 
-Comando Geral do arquivo:
+**Comando Geral do arquivo:**
 
 ### pytest testes/test_login.py -v -s
 
-Comando Separado por Função:
+**Comando Separado por Função:**
 
 ### Verifica se a página retorna HTML válido (Status 200)
 pytest testes/test_login.py::test_login_contem_html -v -s
@@ -161,3 +176,8 @@ pytest testes/test_banco_mocks.py::test_registrar_movimentacao_cria_registro_com
 
 ### Garante o filtro correto separando o tipo "reabastecimento" no histórico
 pytest testes/test_banco_mocks.py::test_get_alertas_reabastecimento_filtra_registros_reabastecimento -v -s
+
+📌 Considerações Finais
+A aplicação dos testes automatizados permite validar o funcionamento do sistema de almoxarifado, reduzindo erros e aumentando a confiabilidade do software.
+
+O projeto demonstra a importância da etapa de testes no ciclo de desenvolvimento de software, garantindo maior qualidade e segurança na entrega da aplicação.
