@@ -4,7 +4,7 @@
 
 #### CURSO: ADS -  TESTE DE SOFTWARE
 
-#### ALUNOS: LETICIA RENATA;  HUDSON PESSOA
+#### ALUNO: LETICIA RENATA;
 
 #### GIT'S: leticiacapacitapaulista-creator; 
 
