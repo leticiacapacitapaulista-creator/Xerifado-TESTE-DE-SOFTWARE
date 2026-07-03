@@ -50,7 +50,7 @@ Python
 #### O link que será gerado do Docker sobre o projeto é: http://localhost:8000/login
 
 
-## Suíte de Testes Automatizados (Pytest)
+## 📦Suíte de Testes Automatizados (Pytest)
 
 Com o banco de dados ativo no Docker, você pode rodar os comandos abaixo diretamente no terminal do seu Windows (PS C:\Users\...). Os testes vão ler, gravar e validar as regras de negócio usando dados reais dentro do MySQL.
 
