@@ -86,7 +86,7 @@ deactivate
 
 **Se preferir validar seções específicas do projeto separadamente, utilize os comandos abaixo.**
 
-### CT01 - Autenticação e Segurança (test_login.py)
+### 1 - Autenticação e Segurança (test_login.py)
 
 Valida o comportamento das rotas de login, renderização de templates HTML e as telas de recuperação/reset de senha integradas ao banco.
 
@@ -94,20 +94,23 @@ Valida o comportamento das rotas de login, renderização de templates HTML e as
 
 ### pytest testes/test_login.py -v -s
 
+---
+
 **Comando Separado por Função:**
 
-### Verifica se a página retorna HTML válido (Status 200)
+### CT01 - Acesso à página de Login (Verifica se a página retorna HTML válido (Status 200))
 pytest testes/test_login.py::test_login_contem_html -v -s
 
-### Verifica exibição do formulário "Esqueci a Senha"
+### CT02 - Verifica exibição do formulário "Esqueci a Senha"
 pytest testes/test_login.py::test_esqueci_senha_exibe_formulario -v -s
 
-### Verifica o fluxo de solicitação de reset de senha
+### CT03 - Verifica o fluxo de solicitação de reset de senha
 pytest testes/test_login.py::test_solicitar_reset_senha_retorna_mensagem -v -s
 
-### Valida tentativa de login com credenciais incorretas no banco
+### CT04 - Valida tentativa de login com credenciais incorretas no banco
 pytest testes/test_login.py::test_login_credenciais_invalidas -v -s
 
+---
 
 ## 2. Níveis de Acesso e Cargos (test_permissoes_usuarios.py)
 Garante que as regras de privilégios entre Administradores, Gestores e Vendedores sejam respeitadas rigorosamente no sistema.
@@ -116,14 +119,17 @@ Comando Geral do arquivo:
 
 ### pytest testes/test_permissoes_usuarios.py -v -s
 
+---
+
 Comando Separado por Função:
 
-### Valida bloqueio ao tentar remover usuários administradores
+### CT05 - Valida bloqueio ao tentar remover usuários administradores
 pytest testes/test_permissoes_usuarios.py::test_mensagem_permissao_remocao_usuario_bloqueia_gestor_para_admin -v -s
 
-### Valida a lógica de quem possui permissão para editar perfis
+### CT06 - Valida a lógica de quem possui permissão para editar perfis
 pytest testes/test_permissoes_usuarios.py::test_pode_editar_usuario_restringe_gestor_para_admin -v -s
 
+---
 
 ## 3. Regras de Negócio do Estoque (test_regras_estoque.py)
 Testa as funções matemáticas que controlam o estoque mínimo de segurança e a listagem de itens críticos.
@@ -132,17 +138,20 @@ Comando Geral do arquivo:
 
 ### pytest testes/test_regras_estoque.py -v -s
 
+---
+
 Comando Separado por Função:
 
-### Valida gatilho quando o estoque atinge o nível mínimo
+### CT07 - Valida gatilho quando o estoque atinge o nível mínimo
 pytest testes/test_regras_estoque.py::test_estoque_baixo_conta_quando_atinge_o_minimo -v -s
 
-### Garante filtragem correta apenas de itens com quantidades críticas
+### CT08 - Garante filtragem correta apenas de itens com quantidades críticas
 pytest testes/test_regras_estoque.py::test_get_itens_estoque_baixo_retorna_apenas_itens_abaixo_do_minimo -v -s
 
-### Valida inclusão de produtos marcados manualmente como "em falta"
+### CT09 - Valida inclusão de produtos marcados manualmente como "em falta"
 pytest testes/test_regras_estoque.py::test_get_itens_estoque_baixo_inclui_itens_solicitados_em_falta -v -s
 
+---
 
 ## 4. Endpoints e Rotas HTTP (test_rotas_http.py)
 Valida os códigos de resposta HTTP diretos gerados pelo servidor web do Flask.
@@ -151,10 +160,14 @@ Comando Geral do arquivo:
 
 ### pytest testes/test_rotas_http.py -v -s
 
-Comando Separado por Função / Filtro:
+---
 
-### Garante o retorno do erro padrão 404 para links inválidos
+*Comando Separado por Função / Filtro:*
+
+### CT10 - Garante o retorno do erro padrão 404 para links inválidos
 pytest testes/test_rotas_http.py -k "rota_inexistente" -v -s
+
+---
 
 ## 5. Banco de Dados e Consultas (test_banco_mocks.py)
 Valida o comportamento das funções que interagem com e-mails de alerta e formatação de logs de auditoria históricos.
@@ -163,19 +176,23 @@ Comando Geral do arquivo:
 
 ### pytest testes/test_banco_mocks.py -v -s
 
+--- 
+
 Comando Separado por Função:
 
-### Valida tratamento de dicionários para destinatários de alertas gerais
+### CT11 - Valida tratamento de dicionários para destinatários de alertas gerais
 pytest testes/test_banco_mocks.py::test_obter_destinatarios_alerta_aceita_cursor_com_dicionarios -v -s
 
-### Valida emails de alerta focados em reabastecimento para os cargos responsáveis
+### CT12 - Valida emails de alerta focados em reabastecimento para os cargos responsáveis
 pytest testes/test_banco_mocks.py::test_obter_destinatarios_alerta_reabastecimento_inclui_gestor_e_vendedor -v -s
 
-### Testa a gravação da estrutura do histórico de movimentações (Log)
+### CT13 - Testa a gravação da estrutura do histórico de movimentações (Log)
 pytest testes/test_banco_mocks.py::test_registrar_movimentacao_cria_registro_com_tipo_e_usuario -v -s
 
-### Garante o filtro correto separando o tipo "reabastecimento" no histórico
+### CT14 - Garante o filtro correto separando o tipo "reabastecimento" no histórico
 pytest testes/test_banco_mocks.py::test_get_alertas_reabastecimento_filtra_registros_reabastecimento -v -s
+
+---
 
 📌 Considerações Finais
 A aplicação dos testes automatizados permite validar o funcionamento do sistema de almoxarifado, reduzindo erros e aumentando a confiabilidade do software.
