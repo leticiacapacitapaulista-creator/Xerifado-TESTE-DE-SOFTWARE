@@ -1,8 +1,8 @@
 # INSTITUTO FEDERAL DE PERNAMBUCO - CAMPUS PAULISTA
-# CURSO: ADS -  TESTE DE SOFTWARE
+## CURSO: ADS -  TESTE DE SOFTWARE
 
-# ALUNOS: LETICIA RENATA;  HUDSON PESSOA
-GIT'S: leticiacapacitapaulista-creator; 
+## ALUNOS: LETICIA RENATA;  HUDSON PESSOA
+## GIT'S: leticiacapacitapaulista-creator; 
 
 ## 📝 Sistema de Gerenciamento de Almoxarifado
 Este é um sistema web desenvolvido para o controle, monitoramento e gerenciamento de insumos e produtos de um Almoxarifado. O sistema conta com controle de níveis de acesso por cargos (Administrador, Gestor e Vendedor), cálculo automático de estoque baixo e envio automatizado de alertas de reabastecimento.
