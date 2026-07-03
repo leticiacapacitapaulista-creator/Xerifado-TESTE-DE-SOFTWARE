@@ -195,6 +195,7 @@ pytest testes/test_banco_mocks.py::test_get_alertas_reabastecimento_filtra_regis
 ---
 
 📌 Considerações Finais
+
 A aplicação dos testes automatizados permite validar o funcionamento do sistema de almoxarifado, reduzindo erros e aumentando a confiabilidade do software.
 
 O projeto demonstra a importância da etapa de testes no ciclo de desenvolvimento de software, garantindo maior qualidade e segurança na entrega da aplicação.
