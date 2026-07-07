@@ -48,7 +48,9 @@ Abra o terminal do seu Windows (PowerShell ou CMD) na raiz do projeto e execute:
 
 Verifique se o banco está ativo, Você pode conferir pelo painel visual do Docker Desktop ou pelo comando:
 
+```bash
 ### docker compose ps
+```
 
 ---
 
@@ -74,7 +76,9 @@ Com o banco de dados ativo no Docker, você pode rodar os comandos abaixo direta
 
 ## 🌟 Comando para rodar TODOS os testes do projeto de uma vez:
 
+```bash
 ### pytest testes/ -v -s
+```
 
 ##### OBS: EMERGÊNCIA PARA CASO O VENV NÃO FUNCIONAR CORRETAMENTE:
 deactivate                       
@@ -96,14 +100,17 @@ Valida o comportamento das rotas de login, renderização de templates HTML e as
 
 **Comando Geral do arquivo:**
 
+```bash
 ### pytest testes/test_login.py -v -s
-
+```
 ---
 
 **Comando Separado por Função:**
 
 ### CT01 - Acesso à página de Login (Verifica se a página retorna HTML válido (Status 200))
+```bash
 pytest testes/test_login.py::test_login_contem_html -v -s
+```
 
 ### CT02 - Verifica exibição do formulário "Esqueci a Senha"
 pytest testes/test_login.py::test_esqueci_senha_exibe_formulario -v -s
