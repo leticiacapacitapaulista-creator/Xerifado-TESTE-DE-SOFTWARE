@@ -8,6 +8,8 @@
 
 #### GIT'S: leticiacapacitapaulista-creator; 
 
+Projeto desenvolvido para a matéria de Desenvolvimento web II
+
 ---
 
 ## 📝 Sistema de Gerenciamento de Almoxarifado - Xerifado
@@ -40,7 +42,9 @@ Abra o Docker Desktop no seu computador.
 Suba o container do banco de dados:
 Abra o terminal do seu Windows (PowerShell ou CMD) na raiz do projeto e execute:
 
+```bash
 ### docker compose up -d
+```
 
 Verifique se o banco está ativo, Você pode conferir pelo painel visual do Docker Desktop ou pelo comando:
 
