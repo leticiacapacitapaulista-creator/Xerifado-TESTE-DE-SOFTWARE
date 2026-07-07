@@ -232,6 +232,7 @@ pytest testes/test_banco_mocks.py::test_registrar_movimentacao_cria_registro_com
 ### CT14 - Garante o filtro correto separando o tipo "reabastecimento" no histórico
 ```bash
 pytest testes/test_banco_mocks.py::test_get_alertas_reabastecimento_filtra_registros_reabastecimento -v -s
+```
 
 ---
 
