@@ -9,7 +9,7 @@
 #### GIT'S: leticiacapacitapaulista-creator; 
 
 Projeto desenvolvido para a matéria de Desenvolvimento web II, em conjunto com o alunoe Audemario Alves. O projeto foi clonado para este repositório do Git e melhorado.
-####### Obs: O meu git usado inicialmente no projeto, está associado em colaboração.
+###### Obs: O meu git usado inicialmente no projeto, está associado em colaboração.
 
 ---
 
