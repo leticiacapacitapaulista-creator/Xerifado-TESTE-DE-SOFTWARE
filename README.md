@@ -43,13 +43,13 @@ Suba o container do banco de dados:
 Abra o terminal do seu Windows (PowerShell ou CMD) na raiz do projeto e execute:
 
 ```bash
-### docker compose up -d
+docker compose up -d
 ```
 
 Verifique se o banco está ativo, Você pode conferir pelo painel visual do Docker Desktop ou pelo comando:
 
 ```bash
-### docker compose ps
+docker compose ps
 ```
 
 ---
@@ -77,7 +77,7 @@ Com o banco de dados ativo no Docker, você pode rodar os comandos abaixo direta
 ## 🌟 Comando para rodar TODOS os testes do projeto de uma vez:
 
 ```bash
-### pytest testes/ -v -s
+pytest testes/ -v -s
 ```
 
 ##### OBS: EMERGÊNCIA PARA CASO O VENV NÃO FUNCIONAR CORRETAMENTE:
@@ -101,7 +101,7 @@ Valida o comportamento das rotas de login, renderização de templates HTML e as
 **Comando Geral do arquivo:**
 
 ```bash
-### pytest testes/test_login.py -v -s
+pytest testes/test_login.py -v -s
 ```
 ---
 
@@ -113,13 +113,19 @@ pytest testes/test_login.py::test_login_contem_html -v -s
 ```
 
 ### CT02 - Verifica exibição do formulário "Esqueci a Senha"
+```bash
 pytest testes/test_login.py::test_esqueci_senha_exibe_formulario -v -s
+```
 
 ### CT03 - Verifica o fluxo de solicitação de reset de senha
+```bash
 pytest testes/test_login.py::test_solicitar_reset_senha_retorna_mensagem -v -s
+```
 
 ### CT04 - Valida tentativa de login com credenciais incorretas no banco
+```bash
 pytest testes/test_login.py::test_login_credenciais_invalidas -v -s
+```
 
 ---
 
@@ -128,17 +134,23 @@ Garante que as regras de privilégios entre Administradores, Gestores e Vendedor
 
 Comando Geral do arquivo:
 
-### pytest testes/test_permissoes_usuarios.py -v -s
+```bash
+pytest testes/test_permissoes_usuarios.py -v -s
+```
 
 ---
 
 Comando Separado por Função:
 
 ### CT05 - Valida bloqueio ao tentar remover usuários administradores
+```bash
 pytest testes/test_permissoes_usuarios.py::test_mensagem_permissao_remocao_usuario_bloqueia_gestor_para_admin -v -s
+```
 
 ### CT06 - Valida a lógica de quem possui permissão para editar perfis
+```bash
 pytest testes/test_permissoes_usuarios.py::test_pode_editar_usuario_restringe_gestor_para_admin -v -s
+```
 
 ---
 
@@ -146,21 +158,28 @@ pytest testes/test_permissoes_usuarios.py::test_pode_editar_usuario_restringe_ge
 Testa as funções matemáticas que controlam o estoque mínimo de segurança e a listagem de itens críticos.
 
 Comando Geral do arquivo:
-
-### pytest testes/test_regras_estoque.py -v -s
+```bash
+pytest testes/test_regras_estoque.py -v -s
+```
 
 ---
 
 Comando Separado por Função:
 
 ### CT07 - Valida gatilho quando o estoque atinge o nível mínimo
+```bash
 pytest testes/test_regras_estoque.py::test_estoque_baixo_conta_quando_atinge_o_minimo -v -s
+```
 
 ### CT08 - Garante filtragem correta apenas de itens com quantidades críticas
+```bash
 pytest testes/test_regras_estoque.py::test_get_itens_estoque_baixo_retorna_apenas_itens_abaixo_do_minimo -v -s
+```
 
 ### CT09 - Valida inclusão de produtos marcados manualmente como "em falta"
+```bash
 pytest testes/test_regras_estoque.py::test_get_itens_estoque_baixo_inclui_itens_solicitados_em_falta -v -s
+```
 
 ---
 
@@ -168,15 +187,18 @@ pytest testes/test_regras_estoque.py::test_get_itens_estoque_baixo_inclui_itens_
 Valida os códigos de resposta HTTP diretos gerados pelo servidor web do Flask.
 
 Comando Geral do arquivo:
-
-### pytest testes/test_rotas_http.py -v -s
+```bash
+pytest testes/test_rotas_http.py -v -s
+```
 
 ---
 
 *Comando Separado por Função / Filtro:*
 
 ### CT10 - Garante o retorno do erro padrão 404 para links inválidos
+```bash
 pytest testes/test_rotas_http.py -k "rota_inexistente" -v -s
+```
 
 ---
 
@@ -184,23 +206,31 @@ pytest testes/test_rotas_http.py -k "rota_inexistente" -v -s
 Valida o comportamento das funções que interagem com e-mails de alerta e formatação de logs de auditoria históricos.
 
 Comando Geral do arquivo:
-
-### pytest testes/test_banco_mocks.py -v -s
+```bash
+pytest testes/test_banco_mocks.py -v -s
+```
 
 --- 
 
 Comando Separado por Função:
 
 ### CT11 - Valida tratamento de dicionários para destinatários de alertas gerais
+```bash
 pytest testes/test_banco_mocks.py::test_obter_destinatarios_alerta_aceita_cursor_com_dicionarios -v -s
+```
 
 ### CT12 - Valida emails de alerta focados em reabastecimento para os cargos responsáveis
+```bash
 pytest testes/test_banco_mocks.py::test_obter_destinatarios_alerta_reabastecimento_inclui_gestor_e_vendedor -v -s
+```
 
 ### CT13 - Testa a gravação da estrutura do histórico de movimentações (Log)
+```bash
 pytest testes/test_banco_mocks.py::test_registrar_movimentacao_cria_registro_com_tipo_e_usuario -v -s
+```
 
 ### CT14 - Garante o filtro correto separando o tipo "reabastecimento" no histórico
+```bash
 pytest testes/test_banco_mocks.py::test_get_alertas_reabastecimento_filtra_registros_reabastecimento -v -s
 
 ---
